@@ -10,7 +10,7 @@ use yii\web\AssetBundle;
  */
 class FileUploadAsset extends AssetBundle
 {
-    public $sourcePath = '@app/modules/content/admin/widgets/assets';
+    public $sourcePath = '@svsoft/yii/content/admin/widgets/assets';
 
     public $css = [
         'css/file-upload-widget.css',
