@@ -1,0 +1,23 @@
+{
+  "name": "svsoft/yii2-content",
+  "description": "Content module for Yii2",
+  "type": "yii2-extension",
+  "keywords": ["yii2","extension","module"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Viktor Shiryakov",
+      "email": "shiryakovv@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0"
+  },
+  "extra": {
+  },
+  "autoload": {
+    "psr-4": {
+        "svsoft\\yii\\content\\": "src"
+    }
+  }
+}
