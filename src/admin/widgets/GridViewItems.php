@@ -24,9 +24,9 @@ class GridViewItems extends GridView
 
     function init()
     {
-
         $propertyColumns = [];
         $columns = [];
+
         if ($this->type)
         {
             $type = $this->type;
@@ -38,6 +38,7 @@ class GridViewItems extends GridView
 
                 $propertyColumns[] = [
                     'label'=>$property->label,
+                    'attribute'=>$property->name,
                     'value'=> function(ItemObject $model) use ($property) {
 
                         $values = $model->getItemProperty($property->property_id)->getValues();
@@ -59,12 +60,9 @@ class GridViewItems extends GridView
                             unset($value);
                         }
 
-                        if ($property->type->simple)
-                        {
-                            return is_array($values) ? implode(', ', $values) : $values;
-                        }
+                        return is_array($values) ? implode(', ', $values) : $values;
 
-                        return Html::a('Просмотр', ['index','type_id'=>$property->type_id]);
+                        //return Html::a('Просмотр', ['index','type_id'=>$property->type_id]);
 
                     },
                     'format'=>'html',
