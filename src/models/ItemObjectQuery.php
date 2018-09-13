@@ -103,6 +103,12 @@ class ItemObjectQuery extends ItemQuery
         $this->_properties = null;
     }
 
+    /**
+     * @param $propertyId
+     *
+     * @return mixed
+     * @throws Exception
+     */
     protected function getPropertyById($propertyId)
     {
         if (!$property = ArrayHelper::getValue($this->properties, $propertyId))
@@ -116,6 +122,7 @@ class ItemObjectQuery extends ItemQuery
      * @param \yii\db\QueryBuilder $builder
      *
      * @return $this|Query
+     * @throws Exception
      */
     public function prepare($builder)
     {
@@ -132,11 +139,13 @@ class ItemObjectQuery extends ItemQuery
                 $conditionValues = [];
                 foreach($conditions as $condition)
                 {
+                    $conditionValue = $condition;
+
                     $operator = $condition[0];
-                    $value = $condition[2];
                     $valueField = $property['value_field'];
 
-                    $conditionValue = [$operator,$valueField,$value];
+                    $conditionValue[0] = $operator;
+                    $conditionValue[1] = $valueField;
 
                     if ($operator == '!=' || $operator == '<>')
                     {
