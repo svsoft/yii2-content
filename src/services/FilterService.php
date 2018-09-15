@@ -29,6 +29,11 @@ class FilterService extends Component
     /**
      * @var ItemObjectQuery
      */
+    private $_query;
+
+    /**
+     * @var ItemObjectQuery
+     */
     private $_filteredQuery;
 
     /**
@@ -94,7 +99,10 @@ class FilterService extends Component
      */
     function getQuery()
     {
-        return $this->getter->getItemObjectQueryFilterTypeName($this->type->name);
+        if ( $this->_query === null )
+            $this->_query = $this->getter->getItemObjectQueryFilterTypeName($this->type->name);
+
+        return $this->_query;
     }
 
     /**
@@ -141,7 +149,7 @@ class FilterService extends Component
             $attribute = $filterProperty->name;
             $property = $this->type->getPropertyByName($attribute);
             $attributeValue  = $filterForm->$attribute;
-            if (!$attributeValue)
+            if ($attributeValue === '' || $attributeValue === null)
                 continue;
 
             switch($filterProperty->type)
@@ -157,6 +165,12 @@ class FilterService extends Component
         $this->_filteredQuery = $query;
     }
 
+
+    function getItems()
+    {
+        return $this->getter->getItemsByQuery($this->getFilteredQuery());
+    }
+    
     /**
      * @param Pagination|null $pagination
      *
@@ -171,6 +185,9 @@ class FilterService extends Component
 
         if ($pagination)
             $dataProvider->pagination = $pagination;
+        else
+            $pagination = $dataProvider->pagination;
+
 
         $pagination->totalCount = $query->count();
 
@@ -211,7 +228,7 @@ class FilterService extends Component
 
                     $propertyValue = $property->getValue();
 
-                    if (!$propertyValue)
+                    if ($propertyValue === '' && $propertyValue === null)
                         continue;
 
                     // Если значение свойства объек, то в качестве текста выводим его название
