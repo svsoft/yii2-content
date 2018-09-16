@@ -6,6 +6,8 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**
+ * Фильтр содержит данные для создания филтра. набор свойств, состоящие из допустимых значений
+ *
  * Class Filter
  * @package svsoft\yii\content\components\filter
  */

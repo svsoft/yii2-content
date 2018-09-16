@@ -16,22 +16,38 @@ use yii\helpers\ArrayHelper;
 use Yii;
 
 /**
+ * Обеспечивают фильтрацию элементов определенного типа.
+ *
  * Class FilterService
  * @package svsoft\yii\content\services
  */
 class FilterService extends Component
 {
     /**
+     * Текущий фильтр
+     *
      * @var Filter
      */
     private $_filter;
 
+
     /**
+     * Форма фильтра
+     *
+     * @var FilterForm
+     */
+    private $_filterForm;
+
+    /**
+     * Запрос для построения фильтра, оъекта $this->_filter
+     *
      * @var ItemObjectQuery
      */
     private $_query;
 
     /**
+     * Запрос для выборки элементов после фильтрации
+     *
      * @var ItemObjectQuery
      */
     private $_filteredQuery;
@@ -42,11 +58,14 @@ class FilterService extends Component
     private $getter;
 
     /**
+     * Тип на основе которого стрится фильтр
      * @var Type
      */
     private $type;
 
     /**
+     * Массив конфигурация свойств фильтра
+     *
      * @var array
      */
     private $filterPropertyConfigs;
@@ -94,6 +113,8 @@ class FilterService extends Component
     }
 
     /**
+     * Возвращает запрос для построения фильтра
+     *
      * @return ItemObjectQuery
      * @throws \yii\base\Exception
      */
@@ -106,6 +127,8 @@ class FilterService extends Component
     }
 
     /**
+     * Возвращает запрос для получение отфильтрованных элементов
+     *
      * @return ItemObjectQuery
      * @throws \yii\base\Exception
      */
@@ -118,26 +141,31 @@ class FilterService extends Component
     }
 
     /**
+     * Создает форму филтра на основе текущего фильтра
+     *
      * @return FilterForm
      * @throws \yii\base\Exception
      * @throws \yii\base\InvalidConfigException
      */
     function getFilterForm()
     {
-        $filterForm = new FilterForm($this->getFilter());
+        if ($this->_filterForm === null)
+            $this->_filterForm = new FilterForm($this->getFilter());
 
-        return $filterForm;
+        return $this->_filterForm;
     }
 
     /**
-     * @param FilterForm $filterForm
+     * Загружает форму фильтрации
      *
      * @return void
      * @throws \yii\base\Exception
      */
-    function loadFilterForm(FilterForm $filterForm)
+    private function loadFilterForm()
     {
         $query = clone $this->getQuery();
+
+        $filterForm = $this->getFilterForm();
 
         $filter = $filterForm->getFilter();
 
@@ -166,12 +194,22 @@ class FilterService extends Component
     }
 
 
+    /**
+     * Возвращет массив отфильтрованных элементов
+     *
+     * @return Item[]
+     * @throws \yii\base\Exception
+     */
     function getItems()
     {
+        $this->loadFilterForm();
+
         return $this->getter->getItemsByQuery($this->getFilteredQuery());
     }
     
     /**
+     * Возвращает объект класса ArrayDataProvider отфильтрованных элементов
+     *
      * @param Pagination|null $pagination
      *
      * @return ArrayDataProvider
@@ -179,6 +217,8 @@ class FilterService extends Component
      */
     function getDataProvider(Pagination $pagination = null)
     {
+        $this->loadFilterForm();
+
         $query = clone $this->getFilteredQuery();
 
         $dataProvider = new ArrayDataProvider();
@@ -201,6 +241,8 @@ class FilterService extends Component
     }
 
     /**
+     * Возвращает объект класса Filter
+     *
      * @return Filter
      * @throws \yii\base\Exception
      * @throws \yii\base\InvalidConfigException
