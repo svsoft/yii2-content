@@ -94,17 +94,27 @@ class FilterService extends Component
             if (!is_array($filterPropertyConfig))
             {
                 $name = $filterPropertyConfig;
-                $filterPropertyConfigs[$name] = [
+                $filterPropertyConfig = [
                     'name'=>$name
                 ];
             }
             else
             {
                 if (is_int($key))
-                {
-                    $filterPropertyConfigs[$filterPropertyConfig['name']] = $filterPropertyConfig;
-                }
+                    $name = $filterPropertyConfig['name'];
+                else
+                    $name = $key;
             }
+
+            $property = $this->type->getPropertyByName($name);
+
+            $filterPropertyConfig = ArrayHelper::merge([
+                'class'=>FilterProperty::class,
+                'label' => $property->label,
+            ], $filterPropertyConfig);
+
+            $filterPropertyConfigs[$filterPropertyConfig['name']] = $filterPropertyConfig;
+
         }
 
         $this->filterPropertyConfigs = $filterPropertyConfigs;
@@ -284,20 +294,18 @@ class FilterService extends Component
                         $value = $propertyValue;
                         $text = $value;
                     }
-                    $valuesGroupByProperties[$propertyId][$value] = $text;
+                    $valuesGroupByProperties[$propertyName][$value] = $text;
                 }
             }
 
             $filterProperties = [];
-            foreach($valuesGroupByProperties as $propertyId=>$values)
-            {
-                $property = $this->type->getPropertyById($propertyId);
 
-                $filterProperties[] = Yii::createObject(ArrayHelper::merge($filterPropertyConfigs[$property->name], [
-                    'class'=>FilterProperty::class,
-                    'label' => $property->label,
-                    'values' => ArrayHelper::getValue($valuesGroupByProperties, $propertyId, []),
+            foreach($this->filterPropertyConfigs as $propertyName=>$filterPropertyConfig)
+            {
+                $filterProperties[] = Yii::createObject(ArrayHelper::merge($filterPropertyConfig, [
+                    'values' => ArrayHelper::getValue($valuesGroupByProperties, $propertyName, []),
                 ]));
+
             }
 
             $this->_filter = new Filter(
