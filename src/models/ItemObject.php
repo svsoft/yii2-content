@@ -52,6 +52,8 @@ class ItemObject extends Item
     {
         if ($this->_itemProperties === null)
         {
+            $this->_itemProperties = [];
+
             $properties = $this->getProperties();
             $values = $this->values;
 
