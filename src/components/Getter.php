@@ -82,6 +82,7 @@ class Getter extends Component
     }
 
     /**
+     * TODO: не оптимально выбирается элемент, ограничить выборку один элементом
      * Получает объект ItemObject по названия типа
      *
      * @param $name
@@ -102,16 +103,12 @@ class Getter extends Component
      */
     function getItemById($id)
     {
-        $item = $this->getResultItemModel($this->getItemObjectById($id));
-
-        return $item;
+        return $this->getResultItemModel($this->getItemObjectById($id));
     }
 
     function getItemBySlug($name)
     {
-        $item = $this->getResultItemModel($this->getItemObjectBySlug($name));
-
-        return $item;
+        return $this->getResultItemModel($this->getItemObjectBySlug($name));
     }
 
     /**

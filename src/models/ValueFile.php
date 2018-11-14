@@ -28,7 +28,7 @@ class ValueFile extends Value
     {
         $rules = parent::rules();
 
-        $rules['value'] = [['value'], 'file', 'maxFiles' => 1, 'extensions' => 'png,jpg,pdf,doc,docx', 'checkExtensionByMimeType'=>false];
+        $rules['value'] = [['value'], 'file', 'maxFiles' => 1, 'checkExtensionByMimeType'=>false];
 
         return $rules;
     }
