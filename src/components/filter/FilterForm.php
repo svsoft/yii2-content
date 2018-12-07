@@ -51,7 +51,6 @@ class FilterForm extends DynamicModel
 
             if ($propertyFilter->type == FilterProperty::FILTER_TYPE_RANGE)
             {
-                $value = $this->$attribute;
                 if ($value[0]< $propertyFilter->getMinValue())
                     $value[0] = $propertyFilter->getMinValue();
                 if ($value[1] > $propertyFilter->getMaxValue())
