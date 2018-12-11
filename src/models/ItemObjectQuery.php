@@ -147,7 +147,7 @@ class ItemObjectQuery extends ItemQuery
                     $conditionValue[0] = $operator;
                     $conditionValue[1] = $valueField;
 
-                    if ($operator == '!=' || $operator == '<>')
+                    if ($operator === '!=' || $operator === '<>')
                     {
                         $conditionValue = ['or', $conditionValue, ['IS', $valueField, null]];
                     }
@@ -245,8 +245,10 @@ class ItemObjectQuery extends ItemQuery
         if (count($condition) == 1)
         {
             $propertyId = key($condition);
-            $operator = is_array($condition[$propertyId]) ? 'IN' : '=';
-            $condition = [$operator, $propertyId, $condition[$propertyId]];
+
+            $value = $condition[$propertyId];
+            $operator = is_array($value) ? 'IN' : '=';
+            $condition = [$operator, $propertyId, $value];
         }
 
         $this->propertyWhere[$condition[1]][] = $condition;

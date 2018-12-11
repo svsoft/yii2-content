@@ -22,4 +22,9 @@ namespace svsoft\yii\content\models;
 class ValueDatetime extends ValueDate
 {
     public $format = 'php:Y-m-d H:i:s';
+
+    public function getValueField()
+    {
+        return 'value_datetime';
+    }
 }
