@@ -54,6 +54,15 @@ class ItemObjectQuery extends ItemQuery
 
     /**
      * @inheritdoc
+     */
+    public function init()
+    {
+        $this->addOrderBy(['sort' => SORT_ASC]);
+        return parent::init();
+    }
+
+    /**
+     * @inheritdoc
      * @return ItemObject[]|array
      */
     public function all($db = null)
