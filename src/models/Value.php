@@ -17,6 +17,8 @@ use yii\db\Query;
  * @property string $value_text
  * @property integer $value_int
  * @property double $value_float
+ * @property string $value_date
+ * @property string $value_datetime
  * @property mixed $value
  *
  * @property Property $property
@@ -44,18 +46,27 @@ abstract class Value extends \yii\db\ActiveRecord
         return [
             //[['item_id', 'property_id'], 'required'],
             [['item_id', 'property_id', 'value_item_id', 'value_int'], 'integer'],
-            [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Property::className(), 'targetAttribute' => ['property_id' => 'property_id']],
-            //[['item_id'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_id' => 'item_id']],
-            ['property_id', 'unique', 'targetAttribute' => ['property_id', 'item_id'],
-             'filter'=>function (Query $query){
-
-                 $pt = Property::tableName();
-                 $vt = self::tableName();
-
-                 return $query->innerJoin($pt, "$pt.property_id = $vt.property_id AND $pt.multiple = 0");
-             }
+            [
+                ['property_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Property::className(),
+                'targetAttribute' => ['property_id' => 'property_id']
             ],
-            ['item_id','valueValidator'],
+            //[['item_id'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_id' => 'item_id']],
+            [
+                'property_id',
+                'unique',
+                'targetAttribute' => ['property_id', 'item_id'],
+                'filter'          => function (Query $query) {
+
+                    $pt = Property::tableName();
+                    $vt = self::tableName();
+
+                    return $query->innerJoin($pt, "$pt.property_id = $vt.property_id AND $pt.multiple = 0");
+                }
+            ],
+            ['item_id', 'valueValidator'],
         ];
     }
 
@@ -67,19 +78,18 @@ abstract class Value extends \yii\db\ActiveRecord
     public function valueValidator($attribute)
     {
         $attributes = [];
-        foreach($this->getAttributes() as $name=>$value)
+        foreach ($this->getAttributes() as $name => $value)
         {
             if (strpos($name, 'value_') === 0)
                 if ($name !== 'value_id')
                     $attributes[] = $name;
-
         }
 
         $count = 0;
-        foreach($this->getAttributes($attributes) as $value)
+        foreach ($this->getAttributes($attributes) as $value)
         {
             if ($value !== null)
-                $count ++;
+                $count++;
         }
 
         if ($count > 1)
@@ -92,14 +102,14 @@ abstract class Value extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'value_id' => 'Value ID',
-            'item_id' => 'Item ID',
-            'property_id' => 'Property ID',
+            'value_id'      => 'Value ID',
+            'item_id'       => 'Item ID',
+            'property_id'   => 'Property ID',
             'value_item_id' => 'Value Item ID',
-            'value_string' => 'Value String',
-            'value_text' => 'Value Text',
-            'value_int' => 'Value Int',
-            'value_float' => 'Value Float',
+            'value_string'  => 'Value String',
+            'value_text'    => 'Value Text',
+            'value_int'     => 'Value Int',
+            'value_float'   => 'Value Float',
         ];
     }
 
@@ -135,6 +145,8 @@ abstract class Value extends \yii\db\ActiveRecord
         $this->value_int = null;
         $this->value_string = null;
         $this->value_text = null;
+        $this->value_date = null;
+        $this->value_datetime = null;
     }
 
     /**
@@ -144,7 +156,7 @@ abstract class Value extends \yii\db\ActiveRecord
      */
     public function setValue($value)
     {
-        if ($value!==null)
+        if ($value !== null)
             $value = $this->prepareSetValue($value);
 
         $this->clearValueFields();
@@ -167,6 +179,7 @@ abstract class Value extends \yii\db\ActiveRecord
     public function getOldValue()
     {
         $field = $this->getValueField();
+
         return $this->getOldAttribute($field);
     }
 
@@ -179,6 +192,7 @@ abstract class Value extends \yii\db\ActiveRecord
 
     /**
      * Функция обработеи значения. Вызывается при установеи значения
+     *
      * @param $value
      *
      * @return mixed
