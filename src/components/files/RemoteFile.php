@@ -9,6 +9,7 @@
 
 namespace svsoft\yii\content\components\files;
 
+use svsoft\yii\content\exceptions\DownloadException;
 use svsoft\yii\content\interfaces\File;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
@@ -57,7 +58,7 @@ class RemoteFile extends BaseObject implements File
 
     /**
      * @return bool
-     * @throws \HttpResponseException
+     * @throws DownloadException
      */
     public function download(): bool
     {
@@ -75,7 +76,7 @@ class RemoteFile extends BaseObject implements File
             return true;
         }
 
-        throw new \HttpResponseException('Ошибка скачивания файла');
+        throw new DownloadException('Ошибка скачивания файла');
     }
 
     /**
