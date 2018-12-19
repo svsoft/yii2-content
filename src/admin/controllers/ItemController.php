@@ -7,12 +7,12 @@ use svsoft\yii\content\forms\import\ItemImport;
 use svsoft\yii\content\forms\import\ReaderJson;
 use svsoft\yii\content\models\ItemObject;
 use svsoft\yii\content\models\Type;
+use svsoft\yii\content\components\files\UploadedFile;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
  * ItemController implements the CRUD actions for Item model.

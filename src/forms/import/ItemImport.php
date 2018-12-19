@@ -9,9 +9,9 @@ use svsoft\yii\content\models\ValueFile;
 use svsoft\yii\content\models\ValueItem;
 use svsoft\yii\content\traits\ModuleTrait;
 use svsoft\yii\content\traits\TransactionTrait;
+use svsoft\yii\content\components\files\UploadedFile;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
-use yii\web\UploadedFile;
 
 /**
  * Class Type

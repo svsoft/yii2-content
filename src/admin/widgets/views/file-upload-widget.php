@@ -17,7 +17,7 @@ use yii\helpers\Html;
     <?= $form->field($model, $attribute.'[]')->input('file', ['multiple' => $widget->multiple, 'accept' => 'image/*', 'title'=>'Выберите файл', 'class'=>'file-input']) ?>
     <div class="file-upload-widget-img-items row">
     <?foreach($files as $key=>$value):?>
-        <? if ($value instanceof \yii\web\UploadedFile) continue;?>
+        <? if ($value instanceof \svsoft\yii\content\components\files\UploadedFile) continue;?>
 
             <div class="file-upload-widget-img-item col-lg-2 col-sm-3 col-xs-6">
 
