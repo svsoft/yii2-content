@@ -2,6 +2,7 @@
 
 namespace svsoft\yii\content\services;
 
+use svsoft\yii\content\components\Cacher;
 use svsoft\yii\content\components\display\Item;
 use svsoft\yii\content\components\filter\Filter;
 use svsoft\yii\content\components\filter\FilterForm;
@@ -9,6 +10,7 @@ use svsoft\yii\content\components\filter\FilterProperty;
 use svsoft\yii\content\components\Getter;
 use svsoft\yii\content\models\ItemObjectQuery;
 use svsoft\yii\content\models\Type;
+use svsoft\yii\content\traits\ModuleTrait;
 use yii\base\Component;
 use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
@@ -23,6 +25,7 @@ use Yii;
  */
 class FilterService extends Component
 {
+    use ModuleTrait;
     /**
      * Текущий фильтр
      *
@@ -71,6 +74,11 @@ class FilterService extends Component
     private $filterPropertyConfigs;
 
     /**
+     * @var Cacher
+     */
+    protected $cacher;
+
+    /**
      * FilterService constructor.
      *
      * @param Type $type
@@ -82,6 +90,7 @@ class FilterService extends Component
         $this->type = $type;
         $this->getter = $getter;
         $this->filterPropertyConfigs = $filterPropertyConfigs;
+        $this->cacher = self::getModule()->cacher;
 
         parent::__construct([]);
     }
@@ -259,58 +268,61 @@ class FilterService extends Component
      */
     function getFilter()
     {
+
         if ($this->_filter === null)
         {
-            $filterPropertyConfigs = $this->filterPropertyConfigs;
-
             $query = clone $this->getQuery();
+            $cacheKey = [__FUNCTION__, md5(serialize($query))];
+            $this->_filter = $this->cacher->getOrSet($cacheKey, function () use ($query) {
+                $filterPropertyConfigs = $this->filterPropertyConfigs;
 
-            $items = $this->getter->getItemsByQuery($query);
+                $items = $this->getter->getItemsByQuery($query);
 
-            $valuesGroupByProperties = [];
+                $valuesGroupByProperties = [];
 
-            foreach($items as $item)
-            {
-                foreach($item->getProperties() as $propertyId=>$property)
+                foreach($items as $item)
                 {
-                    $propertyName = $property->getName();
-
-                    if (empty($filterPropertyConfigs[$propertyName]))
-                        continue;
-
-                    $propertyValue = $property->getValue();
-
-                    if ($propertyValue === '' && $propertyValue === null)
-                        continue;
-
-                    // Если значение свойства объек, то в качестве текста выводим его название
-                    if ($propertyValue instanceof Item)
+                    foreach($item->getProperties() as $propertyId=>$property)
                     {
-                        $value = $propertyValue->item_id;
-                        $text = $propertyValue->name;
+                        $propertyName = $property->getName();
+
+                        if (empty($filterPropertyConfigs[$propertyName]))
+                            continue;
+
+                        $propertyValue = $property->getValue();
+
+                        if ($propertyValue === '' && $propertyValue === null)
+                            continue;
+
+                        // Если значение свойства объек, то в качестве текста выводим его название
+                        if ($propertyValue instanceof Item)
+                        {
+                            $value = $propertyValue->item_id;
+                            $text = $propertyValue->name;
+                        }
+                        else
+                        {
+                            $value = $propertyValue;
+                            $text = $value;
+                        }
+                        $valuesGroupByProperties[$propertyName][$value] = $text;
                     }
-                    else
-                    {
-                        $value = $propertyValue;
-                        $text = $value;
-                    }
-                    $valuesGroupByProperties[$propertyName][$value] = $text;
                 }
-            }
 
-            $filterProperties = [];
+                $filterProperties = [];
 
-            foreach($this->filterPropertyConfigs as $propertyName=>$filterPropertyConfig)
-            {
-                $filterProperties[] = Yii::createObject(ArrayHelper::merge($filterPropertyConfig, [
-                    'values' => ArrayHelper::getValue($valuesGroupByProperties, $propertyName, []),
-                ]));
+                foreach($this->filterPropertyConfigs as $propertyName=>$filterPropertyConfig)
+                {
+                    $filterProperties[] = Yii::createObject(ArrayHelper::merge($filterPropertyConfig, [
+                        'values' => ArrayHelper::getValue($valuesGroupByProperties, $propertyName, []),
+                    ]));
 
-            }
+                }
 
-            $this->_filter = new Filter(
-                $filterProperties
-            );
+                return new Filter(
+                    $filterProperties
+                );
+            }, $this->cacher->tagTypeId($this->type->type_id));
         }
 
         return $this->_filter;

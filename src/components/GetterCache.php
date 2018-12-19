@@ -43,4 +43,13 @@ class GetterCache extends Getter
             return parent::getItemByTypeName($name);
         }, $this->cacher->tagTypeName($name));
     }
+
+    public function getItemById($id)
+    {
+        $cacheKey = [__FUNCTION__, $id];
+
+        return $this->cacher->getOrSet($cacheKey, function () use($id) {
+            return parent::getItemById($id);
+        }, $this->cacher->tagTypeId($id));
+    }
 }

@@ -124,7 +124,7 @@ class ItemObject extends Item
      */
     public static function find()
     {
-        return new ItemObjectQuery(get_called_class());
+        return (new ItemObjectQuery(get_called_class()))->with('type');
     }
 
     /**
