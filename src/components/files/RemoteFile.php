@@ -109,6 +109,7 @@ class RemoteFile extends BaseObject implements File
      */
     public function getExtension(): string
     {
-        return strtolower(pathinfo($this->name, PATHINFO_EXTENSION));
+        list($extension) = explode('?', strtolower(pathinfo($this->name, PATHINFO_EXTENSION)));
+        return $extension;
     }
 }
