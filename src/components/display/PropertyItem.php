@@ -23,9 +23,8 @@ class PropertyItem extends Property
          */
         foreach($itemProperty->valueModels as $valueModel)
         {
-
-            $values[] = self::getModule()->getter->getItemById($valueModel->value);
-            // $values[] = Item::instance($valueModel->valueItem);
+            $values[] = self::getModule()->getter->getItemById($valueModel->value, $itemProperty->property->type_id);
+            //$values[] = Item::instance($valueModel->valueItem);
         }
 
         return $values;

@@ -98,10 +98,11 @@ class Getter extends Component
      * получает объект Item по Ид
      *
      * @param $id
+     * @param $typeId
      *
      * @return Item
      */
-    function getItemById($id)
+    function getItemById($id, $typeId = null)
     {
         return $this->getResultItemModel($this->getItemObjectById($id));
     }
