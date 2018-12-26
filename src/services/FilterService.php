@@ -202,7 +202,8 @@ class FilterService extends Component
             switch($filterProperty->type)
             {
                 case FilterProperty::FILTER_TYPE_RANGE:
-                    $query->andPropertyWhere(['BETWEEN', $property->property_id, $attributeValue[0], $attributeValue[1]]);
+                    if ($attributeValue[0] && $attributeValue[1])
+                        $query->andPropertyWhere(['BETWEEN', $property->property_id, $attributeValue[0], $attributeValue[1]]);
                     break;
                 default:
                     $query->andPropertyWhere([$property->property_id => $attributeValue]);
