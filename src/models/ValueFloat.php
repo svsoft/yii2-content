@@ -40,6 +40,14 @@ class ValueFloat extends Value
         return $value;
     }
 
+    public function prepareGetValue($value)
+    {
+        if ($value !== null)
+            return (float)$value;
+
+        return null;
+    }
+
     public function changeType(Type $newType)
     {
         return $this->changeTypeBase($newType);
