@@ -1,4 +1,5 @@
 <?php
+
 namespace svsoft\yii\content\components;
 
 use svsoft\yii\content\components\display\Item;
@@ -39,16 +40,21 @@ class GetterCache extends Getter
     {
         $cacheKey = [__FUNCTION__, $name];
 
-        return $this->cacher->getOrSet($cacheKey, function () use($name) {
+        return $this->cacher->getOrSet($cacheKey, function () use ($name) {
             return parent::getItemByTypeName($name);
         }, $this->cacher->tagTypeName($name));
     }
 
     public function getItemById($id, $typeId = null)
     {
+        if (!$typeId)
+        {
+            return parent::getItemById($id, $typeId);
+        }
+
         $cacheKey = [__FUNCTION__, $id];
 
-        return $this->cacher->getOrSet($cacheKey, function () use($id, $typeId) {
+        return $this->cacher->getOrSet($cacheKey, function () use ($id, $typeId) {
             return parent::getItemById($id, $typeId);
         }, $this->cacher->tagTypeId($typeId));
     }
