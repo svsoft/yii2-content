@@ -19,6 +19,8 @@ use svsoft\yii\content\models\ItemObject;
 
         <?= $form->field($model, 'sort')->textInput(['maxlength' => true]) ?>
 
+        <?= $form->field($model, 'active')->checkbox() ?>
+
         <?foreach($model->getItemProperties() as $propertyId=>$itemProperty):?>
             <?if($itemProperty->property->type->simple):?>
                 <?=$this->render('controls/simple_type', ['form' => $form, 'itemProperty' => $itemProperty]);?>

@@ -75,6 +75,7 @@ class GridViewItems extends GridView
                 'item_id',
                 'name',
                 'slug',
+                'active'
             ];
 
             $columns = array_merge($columns, $propertyColumns);

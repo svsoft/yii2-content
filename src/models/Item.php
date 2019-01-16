@@ -13,6 +13,7 @@ use svsoft\yii\content\traits\TransactionTrait;
  * @property string $name
  * @property string $slug
  * @property integer $sort
+ * @property bool $active
  *
  * @property Type $type
  * @property Value[] $values
@@ -45,6 +46,7 @@ class Item extends \yii\db\ActiveRecord
         return [
             [['type_id', 'sort'], 'required'],
             [['type_id', 'sort'], 'integer'],
+            ['active', 'boolean'],
             [['name', 'slug'], 'string', 'max' => 255],
             //['name', NameValidator::className()],
             [['name'], 'unique', 'filter'=>function(ItemQuery $query){ return $query->andTypeId($this->type_id); }],
@@ -64,6 +66,7 @@ class Item extends \yii\db\ActiveRecord
             'name' => 'Наименование',
             'slug' => 'Код',
             'sort' => 'Сортировка',
+            'active' => 'Активность',
             'type.name' =>  'Тип'
         ];
     }
