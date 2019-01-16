@@ -55,6 +55,8 @@ class Item extends BaseObject
         $this->item_id = $contentItem->item_id;
         $this->name = $contentItem->name;
         $this->slug = $contentItem->slug;
+        $this->sort = $contentItem->sort;
+        $this->active = $contentItem->active;
 
         foreach($contentItem->getItemProperties() as $itemProperty)
         {
