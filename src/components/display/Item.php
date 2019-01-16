@@ -32,6 +32,10 @@ class Item extends BaseObject
 
     public $slug;
 
+    public $sort;
+
+    public $active;
+
     /**
      * ItemFrom constructor.
      *
