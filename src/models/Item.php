@@ -35,6 +35,7 @@ class Item extends \yii\db\ActiveRecord
     public function init()
     {
         $this->sort = 1000;
+        $this->active = true;
         parent::init();
     }
 
