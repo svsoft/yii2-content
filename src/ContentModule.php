@@ -26,6 +26,7 @@ use svsoft\yii\content\models\ValueInt;
 use svsoft\yii\content\models\ValueItem;
 use svsoft\yii\content\models\ValueString;
 use svsoft\yii\content\models\ValueText;
+use svsoft\yii\content\services\ImageThumb;
 use Yii;
 
 /**
@@ -34,6 +35,7 @@ use Yii;
  *
  * @property Getter $getter
  * @property Cacher $cacher
+ * @property ImageThumb $imageThumb
 
  */
 class ContentModule extends \yii\base\Module
@@ -79,33 +81,38 @@ class ContentModule extends \yii\base\Module
         $this->webDirPath = \Yii::getAlias($this->webDirPath);
 
         $this->valueClasses = [
-            Type::TYPE_FLOAT => ValueFloat::className(),
-            Type::TYPE_FILE => ValueFile::className(),
-            Type::TYPE_STRING => ValueString::className(),
-            Type::TYPE_TEXT => ValueText::className(),
-            Type::TYPE_HTML => ValueHtml::className(),
-            Type::TYPE_ITEM => ValueItem::className(),
-            Type::TYPE_DATE => ValueDate::className(),
-            Type::TYPE_DATETIME => ValueDatetime::className(),
-            Type::TYPE_BOOLEAN => ValueBoolean::className(),
-            Type::TYPE_INT => ValueInt::className()
+            Type::TYPE_FLOAT => ValueFloat::class,
+            Type::TYPE_FILE => ValueFile::class,
+            Type::TYPE_STRING => ValueString::class,
+            Type::TYPE_TEXT => ValueText::class,
+            Type::TYPE_HTML => ValueHtml::class,
+            Type::TYPE_ITEM => ValueItem::class,
+            Type::TYPE_DATE => ValueDate::class,
+            Type::TYPE_DATETIME => ValueDatetime::class,
+            Type::TYPE_BOOLEAN => ValueBoolean::class,
+            Type::TYPE_INT => ValueInt::class
         ];
 
         $this->displayPropertyClasses = [
-            Type::TYPE_STRING   => PropertyString::className(),
-            Type::TYPE_FLOAT    => PropertyFloat::className(),
-            Type::TYPE_FILE     => PropertyFile::className(),
-            Type::TYPE_TEXT     => PropertyText::className(),
-            Type::TYPE_HTML     => PropertyHtml::className(),
-            Type::TYPE_INT      => PropertyInt::className(),
-            Type::TYPE_ITEM     => PropertyItem::className(),
-            Type::TYPE_DATE     => PropertyDate::className(),
-            Type::TYPE_DATETIME => PropertyDatetime::className(),
-            Type::TYPE_BOOLEAN  => PropertyBoolean::className(),
+            Type::TYPE_STRING   => PropertyString::class,
+            Type::TYPE_FLOAT    => PropertyFloat::class,
+            Type::TYPE_FILE     => PropertyFile::class,
+            Type::TYPE_TEXT     => PropertyText::class,
+            Type::TYPE_HTML     => PropertyHtml::class,
+            Type::TYPE_INT      => PropertyInt::class,
+            Type::TYPE_ITEM     => PropertyItem::class,
+            Type::TYPE_DATE     => PropertyDate::class,
+            Type::TYPE_DATETIME => PropertyDatetime::class,
+            Type::TYPE_BOOLEAN  => PropertyBoolean::class,
         ];
 
-        $this->set('getter',GetterCache::className());
-        $this->set('cacher',Cacher::className());
+        $this->set('getter',GetterCache::class);
+        $this->set('cacher',Cacher::class);
+
+        if (empty($this->components['imageThumb']))
+        {
+            $this->set('imageThumb', ImageThumb::class);
+        }
     }
 
     public function getFilePath($filename)
