@@ -1,6 +1,7 @@
 <?php
 namespace svsoft\yii\content\admin\widgets;
 
+use svsoft\yii\content\ContentModule;
 use svsoft\yii\content\models\Type;
 use svsoft\yii\content\models\ValueFile;
 use yii\grid\GridView;
@@ -55,7 +56,11 @@ class GridViewItems extends GridView
                                 $valueModel = $model->getItemProperty($property->property_id)->getValueModel($key);
 
                                 if (in_array($ext, ['png','jpg','jpeg','gif']))
-                                    $value = Html::img($valueModel->getFileWebPath(), ['style'=>'max-width:50px; max-height:50px;']);
+                                {
+                                    /** @var ContentModule $content */
+                                    $content = \Yii::$app->getModule('content');
+                                    $value = Html::img($content->imageThumb->thumbByParams($valueModel->getFileDirPath(), 100, 100), ['style'=>'max-width:50px; max-height:50px;']);
+                                }
                             }
                             unset($value);
                         }
