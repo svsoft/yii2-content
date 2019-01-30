@@ -288,25 +288,35 @@ class FilterService extends Component
                         $propertyName = $property->getName();
 
                         if (empty($filterPropertyConfigs[$propertyName]))
-                            continue;
-
-                        $propertyValue = $property->getValue();
-
-                        if ($propertyValue === '' && $propertyValue === null)
-                            continue;
-
-                        // Если значение свойства объек, то в качестве текста выводим его название
-                        if ($propertyValue instanceof Item)
                         {
-                            $value = $propertyValue->item_id;
-                            $text = $propertyValue->name;
+                            continue;
                         }
-                        else
-                        {
-                            $value = $propertyValue;
-                            $text = $value;
+
+                        $propertyValues = $property->getValue();
+
+                        if(!$property->multiple) {
+                            $propertyValues = [$propertyValues];
                         }
-                        $valuesGroupByProperties[$propertyName][$value] = $text;
+
+                        foreach ($propertyValues as $propertyValue) {
+                            if ($propertyValue === '' && $propertyValue === null)
+                            {
+                                continue;
+                            }
+
+                            // Если значение свойства объек, то в качестве текста выводим его название
+                            if ($propertyValue instanceof Item)
+                            {
+                                $value = $propertyValue->item_id;
+                                $text = $propertyValue->name;
+                            }
+                            else
+                            {
+                                $value = $propertyValue;
+                                $text = $value;
+                            }
+                            $valuesGroupByProperties[$propertyName][$value] = $text;
+                        }
                     }
                 }
 
