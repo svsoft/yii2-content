@@ -228,7 +228,7 @@ class Getter extends Component
         if (!$type)
             throw new Exception('Type '.$typeName.' is not found');
 
-        return $this->itemObjectQuery->andTypeId($type->type_id);
+        return $this->itemObjectQuery->andTypeId($type->type_id)->with('type');
     }
 
 
