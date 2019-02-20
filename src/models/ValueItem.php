@@ -51,7 +51,7 @@ class ValueItem extends Value
      */
     public function prepareSetValue($value)
     {
-        return (int)$value;
+        return $value ? (int)$value : null;
     }
 
     /**
