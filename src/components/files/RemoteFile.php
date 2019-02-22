@@ -87,12 +87,20 @@ class RemoteFile extends BaseObject implements File
      */
     public function saveAs($filePath, $deleteTempFile = true): bool
     {
-        if ($this->loaded)
+        if (!$this->loaded)
         {
-            return rename($this->tmpFile, $filePath);
+            return false;
         }
 
-        return false;
+        if(!rename($this->tmpFile, $filePath)) {
+            return false;
+        }
+
+        if(!chmod($filePath, 0644)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
