@@ -320,7 +320,7 @@ class FilterService extends Component
 
                         foreach ($propertyValues as $propertyValue)
                         {
-                            if ($propertyValue === '' && $propertyValue === null)
+                            if ($propertyValue === '' || $propertyValue === null)
                             {
                                 continue;
                             }
