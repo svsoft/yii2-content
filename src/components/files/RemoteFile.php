@@ -9,7 +9,6 @@
 
 namespace svsoft\yii\content\components\files;
 
-use svsoft\yii\content\exceptions\DownloadException;
 use svsoft\yii\content\interfaces\File;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
@@ -28,8 +27,6 @@ class RemoteFile extends BaseObject implements File
     public $tmpFile;
 
     public $name;
-
-    protected $loaded = false;
 
     public function __destruct()
     {
@@ -50,33 +47,10 @@ class RemoteFile extends BaseObject implements File
 
         if (!self::$tmpDir)
         {
-            self::$tmpDir = ini_get('upload_tmp_dir');
+            self::$tmpDir = sys_get_temp_dir();
         }
 
         $this->name = basename($this->urlFile);
-    }
-
-    /**
-     * @return bool
-     * @throws DownloadException
-     */
-    public function download(): bool
-    {
-        if (!file_exists(self::$tmpDir))
-        {
-            return false;
-        }
-
-        $this->tmpFile = tempnam(self::$tmpDir, null);
-
-        if (file_exists($this->tmpFile) && copy($this->urlFile, $this->tmpFile))
-        {
-            $this->loaded = true;
-
-            return true;
-        }
-
-        throw new DownloadException('Ошибка скачивания файла');
     }
 
     /**
@@ -87,16 +61,18 @@ class RemoteFile extends BaseObject implements File
      */
     public function saveAs($filePath, $deleteTempFile = true): bool
     {
-        if (!$this->loaded)
+        if (!$this->download())
         {
             return false;
         }
 
-        if(!rename($this->tmpFile, $filePath)) {
+        if (!rename($this->tmpFile, $filePath))
+        {
             return false;
         }
 
-        if(!chmod($filePath, 0644)) {
+        if (!chmod($filePath, 0644))
+        {
             return false;
         }
 
@@ -109,7 +85,6 @@ class RemoteFile extends BaseObject implements File
     public function getBaseName(): string
     {
         $pathInfo = pathinfo('_' . $this->name, PATHINFO_FILENAME);
-
         return mb_substr($pathInfo, 1, mb_strlen($pathInfo, '8bit'), '8bit');
     }
 
@@ -120,5 +95,15 @@ class RemoteFile extends BaseObject implements File
     {
         $url = parse_url($this->name, PHP_URL_PATH);
         return strtolower(pathinfo($url, PATHINFO_EXTENSION));
+    }
+
+    /**
+     * @return bool
+     */
+    protected function download(): bool
+    {
+        $this->tmpFile = tempnam(self::$tmpDir, null);
+
+        return file_exists($this->tmpFile) && copy($this->urlFile, $this->tmpFile);
     }
 }
