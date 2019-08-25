@@ -9,6 +9,12 @@ use yii\helpers\Html;
 /* @var $widget \svsoft\yii\content\admin\widgets\FileUploadWidget */
 /* @var $model \yii\base\Model */
 
+
+/** @var \svsoft\yii\content\ContentModule $content */
+$content = Yii::$app->getModule('content');
+
+/** @var $imageThumb \svsoft\yii\content\services\ImageThumb */
+$imageThumb = $content->get('imageThumb');
 ?>
 <div class="file-upload-widget">
 
@@ -17,11 +23,11 @@ use yii\helpers\Html;
     <?= $form->field($model, $attribute.'[]')->input('file', ['multiple' => $widget->multiple, 'accept' => 'image/*', 'title'=>'Выберите файл', 'class'=>'file-input']) ?>
     <div class="file-upload-widget-img-items row">
     <?foreach($files as $key=>$value):?>
-        <? if ($value instanceof \yii\web\UploadedFile) continue;?>
+        <? if ($value instanceof \svsoft\yii\content\components\files\UploadedFile) continue;?>
 
             <div class="file-upload-widget-img-item col-lg-2 col-sm-3 col-xs-6">
 
-                <img src="<?=$widget->webDirPath . DIRECTORY_SEPARATOR . $value?>"/>
+                <img src="<?=$imageThumb->thumbByParams($content->fileDirPath .'/' .$value, 200, 200)?>"/>
 
                 <?=Html::activeHiddenInput($model, $attribute.'['.$key.']', ['value'=>$value])?>
                 <div class="checkbox">

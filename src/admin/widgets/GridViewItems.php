@@ -1,6 +1,7 @@
 <?php
 namespace svsoft\yii\content\admin\widgets;
 
+use svsoft\yii\content\ContentModule;
 use svsoft\yii\content\models\Type;
 use svsoft\yii\content\models\ValueFile;
 use yii\grid\GridView;
@@ -24,9 +25,9 @@ class GridViewItems extends GridView
 
     function init()
     {
-
         $propertyColumns = [];
         $columns = [];
+
         if ($this->type)
         {
             $type = $this->type;
@@ -38,6 +39,7 @@ class GridViewItems extends GridView
 
                 $propertyColumns[] = [
                     'label'=>$property->label,
+                    'attribute'=>$property->name,
                     'value'=> function(ItemObject $model) use ($property) {
 
                         $values = $model->getItemProperty($property->property_id)->getValues();
@@ -54,17 +56,18 @@ class GridViewItems extends GridView
                                 $valueModel = $model->getItemProperty($property->property_id)->getValueModel($key);
 
                                 if (in_array($ext, ['png','jpg','jpeg','gif']))
-                                    $value = Html::img($valueModel->getFileWebPath(), ['style'=>'max-width:50px; max-height:50px;']);
+                                {
+                                    /** @var ContentModule $content */
+                                    $content = \Yii::$app->getModule('content');
+                                    $value = Html::img($content->imageThumb->thumbByParams($valueModel->getFileDirPath(), 100, 100), ['style'=>'max-width:50px; max-height:50px;']);
+                                }
                             }
                             unset($value);
                         }
 
-                        if ($property->type->simple)
-                        {
-                            return is_array($values) ? implode(', ', $values) : $values;
-                        }
+                        return is_array($values) ? implode(', ', $values) : $values;
 
-                        return Html::a('Просмотр', ['index','type_id'=>$property->type_id]);
+                        //return Html::a('Просмотр', ['index','type_id'=>$property->type_id]);
 
                     },
                     'format'=>'html',
@@ -77,6 +80,7 @@ class GridViewItems extends GridView
                 'item_id',
                 'name',
                 'slug',
+                'active'
             ];
 
             $columns = array_merge($columns, $propertyColumns);

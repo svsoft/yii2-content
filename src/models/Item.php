@@ -12,6 +12,8 @@ use svsoft\yii\content\traits\TransactionTrait;
  * @property integer $type_id
  * @property string $name
  * @property string $slug
+ * @property integer $sort
+ * @property bool $active
  *
  * @property Type $type
  * @property Value[] $values
@@ -30,13 +32,10 @@ class Item extends \yii\db\ActiveRecord
         return '{{%svs_content_item}}';
     }
 
-    function __construct($config = [])
+    public function init()
     {
-        parent::__construct($config);
-    }
-
-    function init()
-    {
+        $this->sort = 1000;
+        $this->active = true;
         parent::init();
     }
 
@@ -46,8 +45,9 @@ class Item extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type_id'], 'required'],
-            [['type_id'], 'integer'],
+            [['type_id', 'sort'], 'required'],
+            [['type_id', 'sort'], 'integer'],
+            ['active', 'boolean'],
             [['name', 'slug'], 'string', 'max' => 255],
             //['name', NameValidator::className()],
             [['name'], 'unique', 'filter'=>function(ItemQuery $query){ return $query->andTypeId($this->type_id); }],
@@ -66,6 +66,8 @@ class Item extends \yii\db\ActiveRecord
             'type_id' => 'Тип',
             'name' => 'Наименование',
             'slug' => 'Код',
+            'sort' => 'Сортировка',
+            'active' => 'Активность',
             'type.name' =>  'Тип'
         ];
     }

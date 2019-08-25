@@ -82,6 +82,7 @@ class Getter extends Component
     }
 
     /**
+     * TODO: не оптимально выбирается элемент, ограничить выборку один элементом
      * Получает объект ItemObject по названия типа
      *
      * @param $name
@@ -97,21 +98,18 @@ class Getter extends Component
      * получает объект Item по Ид
      *
      * @param $id
+     * @param $typeId
      *
      * @return Item
      */
-    function getItemById($id)
+    function getItemById($id, $typeId = null)
     {
-        $item = $this->getResultItemModel($this->getItemObjectById($id));
-
-        return $item;
+        return $this->getResultItemModel($this->getItemObjectById($id));
     }
 
     function getItemBySlug($name)
     {
-        $item = $this->getResultItemModel($this->getItemObjectBySlug($name));
-
-        return $item;
+        return $this->getResultItemModel($this->getItemObjectBySlug($name));
     }
 
     /**
@@ -230,7 +228,7 @@ class Getter extends Component
         if (!$type)
             throw new Exception('Type '.$typeName.' is not found');
 
-        return $this->itemObjectQuery->andTypeId($type->type_id);
+        return $this->itemObjectQuery->andTypeId($type->type_id)->with('type');
     }
 
 

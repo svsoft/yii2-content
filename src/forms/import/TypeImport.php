@@ -76,7 +76,7 @@ abstract class TypeImport extends Model
 
 
             // Проверяем обязательность заполнеия элементов в массиве типов
-            foreach(['name','properties'] as $typeKey=>$name)
+            foreach(['name'] as $typeKey=>$name)
             {
                 if (empty($typeArray[$name]))
                 {

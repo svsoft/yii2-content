@@ -54,6 +54,15 @@ class ItemObjectQuery extends ItemQuery
 
     /**
      * @inheritdoc
+     */
+    public function init()
+    {
+        $this->addOrderBy(['sort' => SORT_ASC]);
+        return parent::init();
+    }
+
+    /**
+     * @inheritdoc
      * @return ItemObject[]|array
      */
     public function all($db = null)
@@ -103,6 +112,12 @@ class ItemObjectQuery extends ItemQuery
         $this->_properties = null;
     }
 
+    /**
+     * @param $propertyId
+     *
+     * @return mixed
+     * @throws Exception
+     */
     protected function getPropertyById($propertyId)
     {
         if (!$property = ArrayHelper::getValue($this->properties, $propertyId))
@@ -116,6 +131,7 @@ class ItemObjectQuery extends ItemQuery
      * @param \yii\db\QueryBuilder $builder
      *
      * @return $this|Query
+     * @throws Exception
      */
     public function prepare($builder)
     {
@@ -132,13 +148,15 @@ class ItemObjectQuery extends ItemQuery
                 $conditionValues = [];
                 foreach($conditions as $condition)
                 {
+                    $conditionValue = $condition;
+
                     $operator = $condition[0];
-                    $value = $condition[2];
                     $valueField = $property['value_field'];
 
-                    $conditionValue = [$operator,$valueField,$value];
+                    $conditionValue[0] = $operator;
+                    $conditionValue[1] = $valueField;
 
-                    if ($operator == '!=' || $operator == '<>')
+                    if ($operator === '!=' || $operator === '<>')
                     {
                         $conditionValue = ['or', $conditionValue, ['IS', $valueField, null]];
                     }
@@ -236,8 +254,10 @@ class ItemObjectQuery extends ItemQuery
         if (count($condition) == 1)
         {
             $propertyId = key($condition);
-            $operator = is_array($condition[$propertyId]) ? 'IN' : '=';
-            $condition = [$operator, $propertyId, $condition[$propertyId]];
+
+            $value = $condition[$propertyId];
+            $operator = is_array($value) ? 'IN' : '=';
+            $condition = [$operator, $propertyId, $value];
         }
 
         $this->propertyWhere[$condition[1]][] = $condition;

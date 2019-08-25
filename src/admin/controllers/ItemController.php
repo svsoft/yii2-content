@@ -2,16 +2,17 @@
 
 namespace svsoft\yii\content\admin\controllers;
 
+use svsoft\yii\content\admin\forms\SearchForm;
 use svsoft\yii\content\forms\import\ItemImport;
 use svsoft\yii\content\forms\import\ReaderJson;
 use svsoft\yii\content\models\ItemObject;
 use svsoft\yii\content\models\Type;
+use svsoft\yii\content\components\files\UploadedFile;
 use Yii;
-use svsoft\yii\content\models\ItemSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -45,8 +46,24 @@ class ItemController extends Controller
         if (!$type)
             throw new NotFoundHttpException('The requested page does not exist.');
 
-        $searchModel = new ItemSearch(['type_id'=>$type_id]);
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $query = ItemObject::find()->andTypeId($type_id);
+
+        $searchModel = new SearchForm($type);
+
+        if ($searchModel->load(Yii::$app->request->queryParams))
+        {
+            foreach($searchModel->getAttributes() as $attribute=>$value)
+            {
+                if ($value === null || $value === '')
+                    continue;
+
+                $property = $type->getPropertyByName($attribute);
+                $query->andPropertyWhere([$property->property_id=>$value]);
+            }
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query]);
 
         $this->view->title = $type->label. '. Список';
 
@@ -133,10 +150,10 @@ class ItemController extends Controller
     }
 
     /**
-     * Updates an existing Item model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     *
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {

@@ -2,8 +2,8 @@
 
 namespace svsoft\yii\content\models;
 
+use svsoft\yii\content\interfaces\File;
 use yii\helpers\ArrayHelper;
-use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "{{%svs_content_value}}".
@@ -20,15 +20,19 @@ use yii\web\UploadedFile;
  *
  * @property Property $property
  * @property Item $item
+ * @property string $valueField
  * @property Item $valueItem - Модель элемента для комплексного типа свойств
  */
 class ValueFile extends Value
 {
-    function rules()
+    /**
+     * @return array
+     */
+    public function rules()
     {
         $rules = parent::rules();
 
-        $rules['value'] = [['value'], 'file', 'maxFiles' => 1, 'extensions' => 'png,jpg,pdf,doc,docx', 'checkExtensionByMimeType'=>false];
+        $rules['value'] = [['value'], 'file', 'maxFiles' => 1, 'checkExtensionByMimeType' => false];
 
         return $rules;
     }
@@ -36,7 +40,7 @@ class ValueFile extends Value
     /**
      * @return string
      */
-    public function getValueField()
+    public function getValueField(): string
     {
         return 'value_string';
     }
@@ -48,11 +52,15 @@ class ValueFile extends Value
      */
     public function prepareSetValue($value)
     {
-        if ($value instanceof UploadedFile)
+        if ($value instanceof File)
+        {
             return $value;
+        }
 
         if (!$value)
+        {
             $value = null;
+        }
 
         return $value;
     }
@@ -61,6 +69,8 @@ class ValueFile extends Value
      * @param Type $newType
      *
      * @return false|int
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function changeType(Type $newType)
     {
@@ -78,9 +88,11 @@ class ValueFile extends Value
     public function beforeSave($insert)
     {
         if (!parent::beforeSave($insert))
+        {
             return false;
+        }
 
-        if ($this->value instanceof UploadedFile)
+        if ($this->value instanceof File)
         {
             $uploadedFile = $this->value;
             $filename = $this->generateFileName();
@@ -127,17 +139,22 @@ class ValueFile extends Value
 
     /**
      * Получает src до файла
+     *
      * @param null $filename
      *
      * @return null|string
      */
     public function getFileWebPath($filename = null)
     {
-        if ($filename === null )
+        if ($filename === null)
+        {
             $filename = $this->value;
+        }
 
-        if ($filename instanceof UploadedFile)
+        if ($filename instanceof File)
+        {
             return null;
+        }
 
         return self::getModule()->webDirPath . DIRECTORY_SEPARATOR . $filename;
     }
@@ -151,11 +168,15 @@ class ValueFile extends Value
      */
     public function getFileDirPath($filename = null)
     {
-        if ($filename === null )
+        if ($filename === null)
+        {
             $filename = $this->value;
+        }
 
-        if ($filename instanceof UploadedFile)
+        if ($filename instanceof File)
+        {
             return null;
+        }
 
         return self::getModule()->fileDirPath . DIRECTORY_SEPARATOR . $filename;
     }
@@ -167,8 +188,10 @@ class ValueFile extends Value
      */
     public function generateFileName()
     {
-        if (!$this->value instanceof UploadedFile)
+        if (!$this->value instanceof File)
+        {
             return null;
+        }
 
         return md5($this->value->baseName . time()) . '.' . $this->value->extension;
     }

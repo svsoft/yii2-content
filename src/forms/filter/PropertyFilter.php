@@ -13,7 +13,7 @@ use yii\base\Model;
  * Class Type
  * @package svsoft\yii\content\forms\filter
  *
-*/
+ */
 class PropertyFilter extends Model
 {
 
@@ -153,7 +153,7 @@ class PropertyFilter extends Model
 
         return $itemsConfig;
     }
-    
+
     /**
      * @return array
      */
@@ -161,7 +161,7 @@ class PropertyFilter extends Model
     {
         $query = clone $this->query;
 
-        $query->select(['item_id'])
+        $query->select(['item_id','type_id'])
             ->indexBy('item_id')
             ->asArray();
 

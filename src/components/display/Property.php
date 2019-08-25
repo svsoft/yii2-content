@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
  * @package svsoft\yii\content\models
  *
  * @property mixed $value
+ * @property boolean multiple
  *
  */
 abstract class Property extends BaseObject
@@ -86,6 +87,14 @@ abstract class Property extends BaseObject
             return Html::encode($this->name);
 
         return $this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMultiple()
+    {
+        return $this->multiple;
     }
 
     public function getLabel($encode = true)

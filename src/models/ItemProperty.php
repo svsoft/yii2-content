@@ -35,7 +35,7 @@ class ItemProperty extends Model
     function rules()
     {
         return [
-            ['value','valueValidator']
+            ['value', 'valueValidator']
         ];
     }
 
@@ -53,7 +53,7 @@ class ItemProperty extends Model
 
     public function valueValidator($attribute)
     {
-        foreach($this->valueModels as $key=>$valueModel)
+        foreach ($this->valueModels as $key => $valueModel)
         {
             if (!$valueModel->validate())
             {
@@ -65,7 +65,7 @@ class ItemProperty extends Model
     public function attributeLabels()
     {
         return [
-            'value'=>$this->property->label,
+            'value' => $this->property->label,
         ];
     }
 
@@ -86,11 +86,15 @@ class ItemProperty extends Model
             return $this->_value;
 
         $values = [];
-        foreach($this->valueModels as $key=>$valueModel)
+        foreach ($this->valueModels as $key => $valueModel)
+        {
             $values[$key] = $valueModel->value;
+        }
 
         if (!$this->property->multiple)
+        {
             return ArrayHelper::getValue($values, 0);
+        }
 
         return $values;
     }
@@ -123,20 +127,26 @@ class ItemProperty extends Model
      */
     protected function loadValueModels($values)
     {
-        if (!is_array($values))
-            return;
-
-        // Устанавливаем $valueModel->value null для всех не переданых, для дальнейшего удаления
-        foreach($this->valueModels as $key=>$valueModel)
+        if (!\is_array($values))
         {
-            if (!array_key_exists($key, $values))
-                $values[$key] = null;
+            return;
         }
 
-        foreach($values as $key=>$value)
+        // Устанавливаем $valueModel->value null для всех не переданых, для дальнейшего удаления
+        foreach ($this->valueModels as $key => $valueModel)
         {
-            if (is_array($value))
+            if (!array_key_exists($key, $values))
+            {
+                $values[$key] = null;
+            }
+        }
+
+        foreach ($values as $key => $value)
+        {
+            if (\is_array($value))
+            {
                 continue;
+            }
 
             if (!$model = $this->getValueModel($key))
             {
@@ -164,29 +174,40 @@ class ItemProperty extends Model
     public function getValues()
     {
         if ($this->property->multiple)
+        {
             return $this->value;
+        }
 
         if ($this->value !== null)
+        {
             return [$this->value];
+        }
 
         return [];
     }
 
     /**
      * Добавляет значения в массив values, для не множественного переписывает values
+     *
      * @param $loadValues
      */
     public function loadValues($loadValues)
     {
         if (!$loadValues)
+        {
             return;
+        }
 
         $values = $this->getValues();
 
         if ($this->property->multiple)
+        {
             $values = array_merge($values, $loadValues);
+        }
         else
+        {
             $values = $loadValues;
+        }
 
         $this->setValues($values);
     }
@@ -199,35 +220,39 @@ class ItemProperty extends Model
         if ($this->property->multiple)
         {
             $this->setValue($values);
+
             return;
         }
-
 
         $this->setValue(ArrayHelper::getValue($values, 0));
     }
 
     public function formName()
     {
-        return 'ItemProperty'.$this->property->property_id;
+        return 'ItemProperty' . $this->property->property_id;
     }
 
     public function save($runValidation = true)
     {
         if ($runValidation && !$this->validate())
+        {
             return false;
+        }
 
         $valueModels = $this->valueModels;
 
         // передираем все можели значаний и мохраняем которые были установлены
-        foreach($valueModels as $key=>$valueModel)
+        foreach ($valueModels as $key => $valueModel)
         {
 
             $valueModel->item_id = $this->item->item_id;
 
             if ($valueModel->value === null)
             {
-                if (!$valueModel->delete())
+                if (!$valueModel->isNewRecord && !$valueModel->delete())
+                {
                     return false;
+                }
                 continue;
             }
 

@@ -32,31 +32,45 @@ class ItemObject extends Item
 
     protected $indexByName = [];
 
-    function rules()
+    /**
+     * @return array
+     */
+    public function rules(): array
     {
         $rules = parent::rules();
-        $rules[] = ['itemProperties','propertiesValidator'];
+        $rules[] = ['itemProperties', 'propertiesValidator'];
 
         return $rules;
     }
 
+    protected function loadProperties()
+    {
+        return $this->type->properties;
+    }
+
     protected function getProperties()
     {
-        return $this->type->getProperties()->with('type')->all();
+        $cacheKey = [__FUNCTION__, md5(serialize($this->type_id))];
+        return static::getModule()->cacher->getOrSet($cacheKey, function () {
+            return $this->loadProperties();
+        }, static::getModule()->cacher->tagTypeId($this->type_id));
     }
 
     /**
      * @return ItemProperty[]
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getItemProperties()
+    public function getItemProperties(): array
     {
         if ($this->_itemProperties === null)
         {
+            $this->_itemProperties = [];
+
             $properties = $this->getProperties();
             $values = $this->values;
 
             // Создаем ItemProperty и заполняем свойства
-            foreach($properties as $property)
+            foreach ($properties as $property)
             {
                 // Заполняем индекс по названию
                 $this->indexByName[$property->name] = $property->property_id;
@@ -65,16 +79,16 @@ class ItemObject extends Item
                  * @var $itemProperty ItemProperty
                  */
                 $itemProperty = \Yii::createObject([
-                    'class' => ItemProperty::className(),
-                    'property'=>$property,
-                    'item' => $this
+                    'class'    => ItemProperty::className(),
+                    'property' => $property,
+                    'item'     => $this
                 ]);
 
                 $this->_itemProperties[$property->property_id] = $itemProperty;
             }
 
             // Заполняем значениями
-            foreach($values as $value)
+            foreach ($values as $value)
             {
                 $propertyId = $value->property_id;
 
@@ -93,6 +107,7 @@ class ItemObject extends Item
      * @param $id
      *
      * @return ItemProperty
+     * @throws \yii\base\InvalidConfigException
      */
     public function getItemProperty($id)
     {
@@ -105,6 +120,7 @@ class ItemObject extends Item
      * @param $name
      *
      * @return ItemProperty
+     * @throws \yii\base\InvalidConfigException
      */
     public function getItemPropertyByName($name)
     {
@@ -122,11 +138,12 @@ class ItemObject extends Item
      */
     public static function find()
     {
-        return new ItemObjectQuery(get_called_class());
+        return (new ItemObjectQuery(get_called_class()))->with('type');
     }
 
     /**
      * Переопределяем для загрузки во воложенные объекты itemProperties
+     *
      * @param array $data
      * @param null $formName
      *
@@ -136,7 +153,7 @@ class ItemObject extends Item
     {
         $load = parent::load($data, $formName);
 
-        foreach($this->getItemProperties() as $item)
+        foreach ($this->getItemProperties() as $item)
         {
             $load = $load | $item->load($data);
         }
@@ -144,29 +161,28 @@ class ItemObject extends Item
         return $load;
     }
 
-//    /**
-//     * @return bool
-//     */
-//    public function validateItemProperties()
-//    {
-//        $valid = true;
-//        foreach($this->getItemProperties() as $item)
-//        {
-//            $valid = $valid && $item->validate();
-//        }
-//
-//        return $valid;
-//    }
+    //    /**
+    //     * @return bool
+    //     */
+    //    public function validateItemProperties()
+    //    {
+    //        $valid = true;
+    //        foreach($this->getItemProperties() as $item)
+    //        {
+    //            $valid = $valid && $item->validate();
+    //        }
+    //
+    //        return $valid;
+    //    }
 
     public function propertiesValidator($attribute)
     {
-        foreach($this->getItemProperties() as $item)
+        foreach ($this->getItemProperties() as $item)
         {
             if (!$item->validate())
             {
                 $this->addError($attribute, $item->getFirstError('value'));
             }
-
         }
     }
 
@@ -183,12 +199,12 @@ class ItemObject extends Item
         if (!parent::save())
             return $this->rollBackTransaction();
 
-//        // Валидируем значения свойств
-//        if (!$this->validateItemProperties())
-//            return $this->rollBackTransaction();
+        //        // Валидируем значения свойств
+        //        if (!$this->validateItemProperties())
+        //            return $this->rollBackTransaction();
 
         // Сохраняем все свойства
-        foreach($this->getItemProperties() as $itemProperty)
+        foreach ($this->getItemProperties() as $itemProperty)
         {
             if (!$itemProperty->save(false))
                 return $this->rollBackTransaction();
@@ -210,6 +226,7 @@ class ItemObject extends Item
         }
 
         $this->commitTransaction();
+
         return true;
     }
 
@@ -225,7 +242,7 @@ class ItemObject extends Item
         $valueModels = Value::find()->andValueItemId($this->item_id)->all();
 
         $itemId = [];
-        foreach($valueModels as $valueModel)
+        foreach ($valueModels as $valueModel)
         {
             $itemId[] = $valueModel->item_id;
         }

@@ -18,7 +18,7 @@ use svsoft\yii\content\models\ItemProperty;
         'options' => ['rows' => 6],
         'preset' => 'full',
         'clientOptions'=>ElFinder::ckeditorOptions(['elfinder']) + [
-                'allowedContent' => 'a pre blockquote img em p i h1 h2 h3 div span table tbody thead tr th td ul li ol(*)[*]; br hr strong;',
+                'allowedContent' => 'a pre blockquote img em p i h1 h2 h3 h4 h5 iframe[*]; div span table tbody thead tr th td ul li ol(*)[*]; br hr strong;',
                 'height'=>250
             ]
     ])?>
