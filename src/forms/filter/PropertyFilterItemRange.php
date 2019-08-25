@@ -40,10 +40,10 @@ class PropertyFilterItemRange extends PropertyFilterItem
         if ($this->allValues)
         {
             if ($this->min === null)
-                $this->min = min($this->allValues);
+                $this->min = floor(min($this->allValues));
 
             if ($this->max === null)
-                $this->max = max($this->allValues);
+                $this->max = ceil(max($this->allValues));
 
             if ($this->valueFrom === null)
                 $this->valueFrom = $this->min;
